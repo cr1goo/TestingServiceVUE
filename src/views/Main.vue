@@ -51,7 +51,7 @@
 
     <el-dialog title="Ручное добавление" :visible.sync="newTestForm.manualInput" width="800px">
       <el-button type="default" @click="addNewVariant()" style="margin-bottom: 10px;" icon="el-icon-plus">Добавить вариант</el-button>
-      <el-tabs type="border-card" v-model="newTestForm.activeVariant" closable @tab-remove="delVariant">
+      <el-tabs type="border-card" v-model="newTestForm.currentTestIndex" closable @edit="delVariant">
         <el-tab-pane v-for="(variant, varid) in newTestForm.data.tests" :key="varid" :label="'Вариант '+(varid+1)"> 
           <el-button type="success" size="small" icon="el-icon-plus" @click="addNewQuestion(variant.questions)" style="margin-bottom: 10px;">Добавить вопрос</el-button>
           <el-collapse accordion v-for="(question, questid) in variant.questions" :key="questid">
@@ -131,9 +131,9 @@
 </template>
 
 <style>
-  .el-collapse-item__header {
-    border-bottom: 0;
-  }
+.el-collapse-item__header {
+  border-bottom: 0;
+}
 </style>
 
 
@@ -147,6 +147,7 @@ export default {
       },
 
       newTestForm: {
+        currentTestIndex: '',
         isShow: false,
         manualInput: false,
         previewDialog: false,
@@ -201,22 +202,25 @@ methods: {
       })
     },
 
-      delVariant(variant) {
-        let tabs = this.newTestForm.data.tests;
-        let activeName = this.newTestForm.activeVariant;
-        if (activeName === variant) {
-          tabs.forEach((tab, index) => {
-            if (tab.name === variant) {
-              let nextTab = tabs[index + 1] || tabs[index - 1];
-              if (nextTab) {
-                activeName = nextTab.name;
-              }
-            }
-          });
+      delVariant(_, action) {
+        if(action === 'remove'){
+          this.newTestForm.data.tests.splice(this.newTestForm.currentTestIndex, 1);
         }
+        // let tabs = this.newTestForm.data.tests;
+        // let activeName = this.newTestForm.activeVariant;
+        // if (activeName === variant) {
+        //   tabs.forEach((tab, index) => {
+        //     if (tab.name === variant) {
+        //       let nextTab = tabs[index + 1] || tabs[index - 1];
+        //       if (nextTab) {
+        //         activeName = nextTab.name;
+        //       }
+        //     }
+        //   });
+        // }
 
-        this.newTestForm.activeVariant = activeName;
-        this.newTestForm.data.tests = tabs.filter(tab => tab.name !== variant);
+        // this.newTestForm.activeVariant = activeName;
+        // this.newTestForm.data.tests = tabs.filter(tab => tab.name !== variant);
       },
 
     delQuestion(variant, question) {
